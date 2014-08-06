@@ -1,0 +1,161 @@
+<html>
+<head><title>Amot'l Paa</title></head>
+<body>
+<script src="http://davidbau.com/encode/seedrandom-min.js"></script> <!-- because Math.random() is stupid -->
+<script type="text/javascript">
+	var SESSION_SEED = Math.random();
+	Player = new Object();
+	Player.x = 0;
+	Player.y = 0;
+
+	function respondToUser() {
+		setMessage("");
+
+		var input = document.getElementById("input");
+		switch (input.value.trim().toLowerCase()) {
+			case "n": case "north":
+				movePlayer(0,1);
+				break;
+			case "s": case "south":
+				movePlayer(0,-1);
+				break;
+			case "e": case "east":
+				movePlayer(1,0);
+				break;
+			case "w": case "west":
+				movePlayer(-1,0);
+				break;
+			default:
+				setMessage("You can't do that!");
+		}
+
+		input.value = "";
+		return false;
+	}
+
+	function setMessage(text) {
+		var message = document.getElementById("message");
+		if (text.trim().length > 0) {
+				message.style.display = "";
+				message.innerHTML = text;
+		} else {
+				message.style.display = "none";
+		}
+	}
+
+	function movePlayer(x, y) {
+		if (shallPass(Player.x+x/2,Player.y+y/2)) {
+			Player.x += x;
+			Player.y += y;
+		} else {
+			setMessage("You can't go that way!");
+		}
+
+		describeLocation();
+		showCommands();
+	}
+
+	function seedLocationSet(x,y,set) {
+		set = (typeof set == "undefined")? 0 : set;
+		Math.seedrandom(SESSION_SEED);
+		Math.seedrandom(Math.random() + x);
+		Math.seedrandom(Math.random() + y);
+		Math.seedrandom(Math.random() + set);
+	}
+
+	function shallPass(x, y) {
+		if (Math.round(x/2)==0 && Math.round(y/2)==0) { return true; }
+		seedLocationSet(x, y)
+		return (Math.random() > 0.4);
+	}
+
+	function getLocationFeature(size, set) {
+		var bozoX = 0;
+		var bozoY = 0;
+		for (var i = size; i > 0.25; i = i/2) {
+			seedLocationSet(Math.round(Player.x/i), Math.round(Player.y/i), set);
+			bozoX += Math.random()*i - i/2;
+			bozoY += Math.random()*i - i/2;
+		}
+		seedLocationSet(Math.round((Player.x+bozoX)/size), Math.round((Player.y+bozoY)/size), set)
+		return Math.random();
+	}
+
+	function describeLocation() {
+		var description = "(" + Player.x + "," + Player.y + ") You are standing ";
+		if (Player.x == 0 && Player.y == 0) {
+			description += "in a dark, featureless room with four exits.";
+		} else {
+			var setting = getLocationFeature(5, 'setting');
+			var outside = false;
+			if (setting >= 0 && setting < 0.2) {
+				description += "in a dark, featureless room. ";
+			} else if (setting >= 0.2 && setting < 0.4) {
+				description += "on a dirt path surrounded by hedges. ";
+				outside = true;
+			} else if (setting >= 0.4 && setting < 0.5) {
+				description += "in the middle of a small bright clearing. ";
+				outside = true;
+			}  else if (setting >= 0.5 && setting < 0.9) {
+				description += "in a thick, tangled wood. ";
+			} else if (setting >= 0.9 && setting < 1) {
+				description += "in a strange, foggy pocket dimension. ";
+			}
+
+			if (outside) {
+				var weather = getLocationFeature(15, 'weather');
+				if (weather >= 0 && weather < .4) {
+					description += "There are a few clouds in the sky. You can't tell if it's early morning or late evening. ";
+				} else if (weather >= 0.4 && weather < .6) {
+					description += "Roiling clouds lower in the sky. ";
+				} else if (weather >= 0.6 && weather < .7) {
+					description += "The sky is a bright, clear blue. ";
+				} else if (weather >= 0.7 && weather < .9) {
+					description += "A panoply of stars glitters above you. ";
+				}
+			}
+
+			var item = getLocationFeature(1, 'item');
+			if (item >= 0 && item < 0.1) {
+				description += "There is a pile of useless stones on the ground. ";
+			} else if (item >= 0.1 && item < 0.2) {
+				description += "Beside you is a large gold statue. It is too heavy to lift.";
+			}
+		}
+
+		document.getElementById("description").innerHTML = description;
+	}
+
+	function showCommands() {
+		var commands = "";
+
+		if (shallPass(Player.x,Player.y+0.5)) {
+			commands += "(n)orth, ";
+		}
+		if (shallPass(Player.x,Player.y-0.5)) {
+			commands += "(s)outh, ";
+		}
+		if (shallPass(Player.x+0.5,Player.y)) {
+			commands += "(e)ast, ";
+		}
+		if (shallPass(Player.x-0.5,Player.y)) {
+			commands += "(w)est, ";
+		}
+
+		if (commands.length > 1) { commands = commands.substring(0,commands.length - 2); }
+
+		document.getElementById("commands").innerHTML = commands;
+	}
+</script>
+
+<div id="description"><span style="color:Green;">~ Welcome to Amot'l Paa! ~</span><br>
+
+You are standing in a dark, featureless room with four exits.</div>
+
+<div style="color:Blue;">Commands are: <span id="commands">(0,0) (n)orth, (s)outh, (e)ast, (w)est</span></div>
+<div id="message" style="color:Red;display:none;"></div>
+<form onsubmit="return respondToUser();">
+<input type="text" name="input" id="input" /> <input type="submit" value="Submit" />
+</form>
+</body>
+</html>

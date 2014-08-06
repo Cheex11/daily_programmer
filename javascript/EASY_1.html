@@ -1,0 +1,31 @@
+<html>
+
+<head>
+
+<title>/r/DailyProgrammer Easy #1</title>
+
+<script type="text/javascript">
+    function input(){
+        var name = entry.name.value;
+        var age = entry.age.value;
+        var user = entry.username.value;
+        document.getElementById('outdiv').innerHTML += "Your name is "+ name +", you are "+ age +" years old, and your username is "+ user +".<br/>";
+    }
+</script>
+
+</head>
+
+<body>
+
+<form name="entry">
+    <label for="name">Your name: </label><input name="name" type="text"></input><br/>
+    <label for="age">Your age: </label><input name="age" type="text"></input><br/>
+    <label for="username">Your username: </label><input name="username" type="text"></input><br/>
+    <input type="button" value="Submit" name="subbutton" onClick="input()">
+</form>
+
+<div id="outdiv"></div>
+
+</body>
+
+</html>
