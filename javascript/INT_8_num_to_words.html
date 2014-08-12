@@ -1,0 +1,88 @@
+<!doctype html>
+    <html>
+    <head>
+        <meta charset=utf-8>
+        <title>The Textifier</title>
+    </head>
+    <body>
+    <label for="number_entry"><input type="textbox" id="number_entry" name="number_entry"></input>
+    <div id ="aresult">
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script>
+    $(function(){
+        $('#number_entry').on('keyup',function(){
+            var texte = $(this).val();
+            var texto = '';
+            var basic_nums=['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+            var tens = ['twenty ','thirty ','forty ','fifty ','sixty ','seventy ','eighty ','ninety ']
+
+            var length = texte.length;
+
+            function each_set(length, num)
+            {
+            if (length == 1)
+            {
+                return basic_nums[num[0]];
+            }
+            if (length ==2)
+            {
+                if (num[0]+num[1]<20)
+                { return basic_nums[num[0]+num[1]]; }
+                else
+                {
+                    return tens[num[0]-2]+basic_nums[num[1]];
+                }
+            }
+            if (length ==3)
+            {
+                if (num[1]==1)
+                {
+                    return basic_nums[num[0]]+ ' hundred and '+(basic_nums[num[1]+num[2]]);
+                }
+                else if (num[1]==0)
+                {
+                    return basic_nums[num[0]]+ ' hundred and '+basic_nums[num[2]];
+                }
+                else
+                {
+                return basic_nums[num[0]]+ ' hundred and '+tens[num[1]-2]+basic_nums[num[2]];
+                }
+            }
+            }
+            if (length < 4) {
+                texto = each_set(length, texte);
+            }
+            if (length==4)
+            {
+            texto = each_set(1, texte[0]) + ' thousand ' + each_set(3,texte.substring(1,length));
+            }
+            if (length==5)
+            {
+            texto = each_set(2, texte.substring(0,2)) + ' thousand ' + each_set(3,texte.substring(2,length));
+            }
+            if (length==6)
+            {
+                texto = each_set(3, texte.substring(0,3)) + ' thousand ' + each_set(3,texte.substring(3,length));
+            }
+            if (length==7)
+            {
+            texto = each_set(1, texte.substring(0,1)) + ' million ' + each_set(3, texte.substring(1,4)) + ' thousand ' + each_set(3,texte.substring(4,length));
+            }
+            if (length == 8)
+            {
+            texto = each_set(2, texte.substring(0,2)) + ' million ' + each_set(3, texte.substring(2,5)) + ' thousand ' + each_set(3,texte.substring(5,length));
+            }
+            if (length == 9)
+            {
+            texto = each_set(3, texte.substring(0,3)) + ' million ' + each_set(3, texte.substring(3,6)) + ' thousand ' + each_set(3,texte.substring(6,length));
+            }
+        if (!isNaN(texte))
+        $('#aresult').text(texto);
+        else
+        $('#aresult').text('Sorry, input must be numeric')
+    })
+})
+</script>
+</body>
+</html>
